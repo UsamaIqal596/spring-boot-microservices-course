@@ -1,4 +1,3 @@
 package com.sivalabs.bookstore.catalog.web.controllers;
 
-public class ProductController {
-}
+public class ProductController {}
