@@ -33,8 +33,8 @@ jobs:
 
       - name: Make Maven wrapper executable
         run: chmod +x mvnw
-
-#onr of the solution to automatically fix the formatting so my cicd dont fail
+#      Do not let CI auto-fix code (i.e., avoid running spotless:apply in CI and auto-commit).
+#      CI should fail and ask developer to fix locally. Use pre-commit hooks / IDE formatting to avoid CI failures.
 #      - name: Fix formatting
 #        run: ./mvnw spotless:apply
 
