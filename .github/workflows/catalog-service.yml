@@ -34,6 +34,10 @@ jobs:
       - name: Make Maven wrapper executable
         run: chmod +x mvnw
 
+#onr of the solution to automatically fix the formatting so my cicd dont fail
+#      - name: Fix formatting
+#        run: ./mvnw spotless:apply
+
       - name: Build with Maven
         run: ./mvnw -ntp verify
 
