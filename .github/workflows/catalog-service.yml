@@ -6,7 +6,7 @@ on:
       - catalog-service/**
     branches:
       - '**'
-      #      - 'main'
+      #      - 'main' we can change name whatever we want
 
   pull_request:
     branches: [main]
