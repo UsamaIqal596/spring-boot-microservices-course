@@ -1,6 +1,5 @@
 package com.sivalabs.bookstore.catalog;
 
-
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +15,7 @@ public class AbstractIntegrationTest {
 
     @BeforeEach
     public void setup() {
-       //RestAssured.basePath = "http://localhost:" + port; // or we can use below
-       RestAssured.port = port;
+        // RestAssured.basePath = "http://localhost:" + port; // or we can use below
+        RestAssured.port = port;
     }
 }
