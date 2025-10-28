@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -16,8 +15,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 @DataJpaTest(
         properties = {
-            "spring.test.database.replace=none", // by default, @DataJpaTest tries to connect with the H2 Database, so we
-            // disabled that by this line
+            "spring.test.database.replace=none", // by default, @DataJpaTest tries to connect with the H2 Database, so
+            // we disabled that by this line
             "spring.datasource.url=jdbc:tc:postgresql:16-alpine:///db",
         })
 // we can use this annotation to import the ContainersConfig class but let say our configuration class is also
@@ -39,7 +38,7 @@ class ProductRepositoryTest { // this class is an example of a Slice Test where 
 
     @Test
     void debugBeans() {
-        //Arrays.stream(ctx.getBeanDefinitionNames()).forEach(System.out::println);
+        // Arrays.stream(ctx.getBeanDefinitionNames()).forEach(System.out::println);
     }
 
     @Autowired
