@@ -1,0 +1,29 @@
+name: 'spring-boot-microservices-course'
+services:
+  catalog-service:
+    image: usamaiqbal/bookstore-catalog-service
+    container_name: catalog-service
+    environment:
+#      we can use below by Capitalizing the .prperties and relace . with underscore.
+#      e.g spring.datasource.url  ---> SPRING_DATASOURCE_URL = jdbc:postgresql://catalog-db:5432/postgres
+#      that is also fine, but below way of setting properties more readable we can use both it's a personal preference.
+#      - SPRING_PROFILES_ACTIVE=docker
+#      this below port is the container port, not the hostName("15432:5432") because both are running inside the docker
+      - DB_URL=jdbc:postgresql://catalog-db:5432/postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - SWAGGER_API_GATEWAY_URL=http://api-gateway:8989/catalog
+      - MANAGEMENT_TRACING_ENABLED=${MANAGEMENT_TRACING_ENABLED}
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+    depends_on:
+      catalog-db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+#    labels:
+#      logging: "promtail"

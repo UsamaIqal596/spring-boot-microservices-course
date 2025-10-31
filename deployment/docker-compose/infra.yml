@@ -3,6 +3,7 @@ name: 'spring-boot-microservices-course'
 services:
   catalog-db:
     image: postgres:16-alpine
+    # this container name becomes the host name in the apps.yml file while connecting with the DB(IP)
     container_name: catalog-db
     environment:
       - POSTGRES_USER=postgres
