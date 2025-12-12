@@ -235,3 +235,123 @@ spring-boot-microservices-course
 | Async events             | **Awaitility + AssertJ**         | `await().untilAsserted(...);`                           |
 | External API testing     | **RestAssured**                  | `given().get(...).then().statusCode(200)`               |
 
+# RabbitMQ Summary
+
+## 1. What RabbitMQ is
+
+RabbitMQ is a **message broker** – a software that allows applications to communicate asynchronously by sending messages through queues.
+
+* Implements the **AMQP (Advanced Message Queuing Protocol)** standard.
+* Decouples applications: producers send messages, consumers receive them later.
+
+## 2. Core Concepts
+
+* **Producer:** The application or service that sends messages.
+* **Queue:** A storage buffer where messages wait until consumed.
+* **Consumer:** The application that retrieves and processes messages.
+* **Exchange:** Routes messages from producers to queues based on rules (**bindings**).
+
+### Types of Exchanges
+
+* **Direct:** Routes messages to queues with exact matching routing keys.
+
+* **Fanout:** Broadcasts messages to all bound queues.
+
+* **Topic:** Routes messages based on pattern-matching routing keys.
+
+* **Headers:** Routes based on message headers instead of routing keys.
+
+* **Binding:** A rule that links an exchange to a queue.
+
+* **Routing Key:** A label used by exchanges to route messages to queues.
+
+## 3. How it Works
+
+1. Producer sends a message to an exchange.
+2. Exchange routes the message to one or more queues using bindings.
+3. Consumer reads the message from the queue.
+4. Messages can be acknowledged to ensure delivery reliability.
+
+## 4. Key Features
+
+* **Reliability:** Durable queues, persistent messages, and acknowledgments.
+* **Scalability:** Can cluster RabbitMQ servers for high availability.
+* **Flexible routing:** Multiple exchange types allow different messaging patterns.
+* **Supports multiple protocols:** AMQP, MQTT, STOMP, etc.
+* **Plugins:** For monitoring, management UI, federation, and more.
+
+## 5. Use Cases
+
+* **Asynchronous processing:** Offloading tasks to workers.
+* **Microservices communication:** Decoupling service interactions.
+* **Event-driven architecture:** Broadcasting events to multiple services.
+* **Task scheduling:** Delaying tasks or retries.
+
+## 6. Pros
+
+* Reliable and widely adopted.
+* Mature ecosystem with good documentation.
+* Flexible routing and patterns.
+* Supports clustering and high availability.
+
+## 7. Cons
+
+* Can add operational complexity.
+* Performance may be lower than simpler brokers for very high-throughput cases.
+* Requires management of connections, queues, and exchanges.
+
+![img_13.png](docs/IMAGES/img_13.png)
+![img_12.png](docs/IMAGES/img_12.png)
+![img_12.png](docs/IMAGES/img_14.png)
+![img_12.png](docs/IMAGES/img_15.png)
+![img_12.png](docs/IMAGES/img_16.png)
+
+### two/three??? times i call from postman and its circuit become ***open*** for each call there are two retry in the backend
+![img_12.png](docs/IMAGES/img_18.png)
+![img_12.png](docs/IMAGES/img_17.png)
+
+###outBox Pattren when interecting with external systems through quees use thsi pattren and save the message/event into the DB first before direcly sending it into the quee
+
+![img_12.png](docs/IMAGES/img_20.png)
+
+## use this way so that we can have a consistent stage regarding to save the data into the db and publich the event in 
+## a trabsactional way and then use a schedule job with the retry mechanism to 
+## consistently sending the message and with the feature of removing/reading duplicate messaegs from the same queee
+![img_12.png](docs/IMAGES/img_19.png)
+![img_12.png](docs/IMAGES/img_21.png)
+
+
+YOUR WINDOWS MACHINE                         DOCKER CONTAINERS
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  Browser/Postman                           Docker Network                   │
+│  ┌─────────────┐                          ┌─────────────────────────────┐   │
+│  │             │                          │                             │   │
+│  │ localhost:  │                          │  ┌─────────────────────┐    │   │
+│  │   8083  ────┼──────────────────────────┼─►│  catalog-service    │    │   │
+│  │             │         8083:8083        │  │  (port 8083)        │    │   │
+│  │             │                          │  └──────────┬──────────┘    │   │
+│  │             │                          │             │               │   │
+│  │ localhost:   │                          │             │ catalog-db: 5432│  │
+│  │   8084  ────┼──────────────────────────┼─►┌──────────▼──────────┐    │   │
+│  │             │         8084:8084        │  │  order-service      │    │   │
+│  │             │                          │  │  (port 8084)        │    │   │
+│  │             │                          │  └──────────┬──────────┘    │   │
+│  │             │                          │             │               │   │
+│  │ localhost:  │                          │  ┌──────────▼──────────┐    │   │
+│  │   15432 ────┼──────────────────────────┼─►│  catalog-db         │    │   │
+│  │             │        15432:5432        │  │  (port 5432)        │    │   │
+│  │             │                          │  └─────────────────────┘    │   │
+│  │             │                          │                             │   │
+│  │ localhost:  │                          │  ┌─────────────────────┐    │   │
+│  │   25432 ────┼──────────────────────────┼─►│  orders-db          │    │   │
+│  │             │        25432:5432        │  │  (port 5432)        │    │   │
+│  │             │                          │  └─────────────────────┘    │   │
+│  │             │                          │                             │   │
+│  │ localhost:  │                          │  ┌─────────────────────┐    │   │
+│  │   5672  ────┼──────────────────────────┼─►│  bookstore-rabbitmq │    │   │
+│  │   15672 ────┼──────────────────────────┼─►│  (5672 & 15672)     │    │   │
+│  │             │                          │  └─────────────────────┘    │   │
+│  └─────────────┘                          └─────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘

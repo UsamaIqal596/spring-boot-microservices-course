@@ -16,10 +16,57 @@ services:
 #      - MANAGEMENT_TRACING_ENABLED=${MANAGEMENT_TRACING_ENABLED}
 #      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
     ports:
-      - "8082:8082"
+      - "8081:8081"
     restart: unless-stopped
     depends_on:
       catalog-db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+#    labels:
+#      logging: "promtail"
+
+  order-service:
+    image: usamaiqbal/bookstore-order-service
+    container_name: order-service
+    environment:
+      #     just for underatsnding from the above
+      #      we can use below by Capitalizing the .prperties and relace . with underscore.
+      #      e.g spring.datasource.url  ---> SPRING_DATASOURCE_URL = jdbc:postgresql://catalog-db:5432/postgres
+      #      that is also fine, but below way of setting properties more readable we can use both it's a personal preference.
+      #      - SPRING_PROFILES_ACTIVE=docker
+      #      this below port is the container port, not the hostName("15432:5432") because both are running inside the docker
+      #      - DB_URL=jdbc:postgresql://catalog-db:5432/postgres
+
+
+
+
+      #   all the properties that are provided below are environment variables by capitalizing the .properties file properties
+      - SPRING_PROFILES_ACTIVE=docker
+#       as both services are in Docker so host name of catalog-service is its container name
+      - ORDERS_CATALOG_SERVICE_URL=http://catalog-service:8081
+#      - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
+      - DB_URL=jdbc:postgresql://orders-db:5432/postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      # Container name of rabbit-MQ
+      - RABBITMQ_HOST=bookstore-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+#      - OAUTH2_SERVER_URL=http://keycloak:9191
+#      - SWAGGER_API_GATEWAY_URL=http://api-gateway:8989/orders
+#      - MANAGEMENT_TRACING_ENABLED=${MANAGEMENT_TRACING_ENABLED}
+#      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+    depends_on:
+      orders-db:
+        condition: service_healthy
+      bookstore-rabbitmq:
         condition: service_healthy
     deploy:
       resources:

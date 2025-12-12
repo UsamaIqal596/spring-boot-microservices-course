@@ -21,10 +21,14 @@ tasks:
       - "{{.MVN}} spotless:apply"
 
   build:
+
     cmds:
       #      as log, as we don't have the catalog service as Dockerize, we used below command.
       #      - "{{.MVN}} verify"
-      - "{{.MVN}}  -pl catalog-service spring-boot:build-image -DskipTests"
+      #      after below command Image is written into the local Docker daemon
+      - "{{.MVN}} -pl catalog-service spring-boot:build-image -DskipTests"
+      - "{{.MVN}} -pl order-service spring-boot:build-image -DskipTests"
+
   start_infra:
     cmds:
       - docker compose -f "{{.INFRA_DC_FILE}}" up -d
@@ -43,6 +47,22 @@ tasks:
   start:
     deps: [ build ]
     cmds:
+  # docker compose reads infra.yml and apps.yml, merges them into one composed
+  #  model (services, networks, volumes, depends_on, envs, ports).
+  #  Docker Engine (inside Docker Desktop VM) creates a project network
+  #  Docker Engine creates and starts infra containers (first)
+  #  After infra is healthy, Docker Engine starts **app containers** (second)
+  #   -catalog-service container is created from the local image produced earlier. Docker attaches it with same project
+  #   network, mounts volumes (if any), injects environment variables defined in apps.yml,and maps ports (8082:8082).
+  # Inside the running catalog-service process, Spring Boot starts
+  #   -Spring Boot reads configuration in its precedence order (see later). It receives DB connection details via
+  #  environment variables (injected by Compose). Those values override defaults in application.properties where
+  #  placeholders are used (e.g. ${DB_URL:...}).
+  #  Runtime connectivity
+  #   - catalog-service resolves catalog-db via Docker network DNS, opens a JDBC connection to Postgres, registers
+  #     health checks, exposes REST endpoints on port 8082.
+  # Result: both containers run inside Docker Desktop’s Linux VM. The local Docker daemon manages their lifecycle,
+  #  resource usage, logs, volumes, and network routing to your host.
       - "docker compose -f {{.INFRA_DC_FILE}} -f {{.APPS_DC_FILE}} up -d"
 
   stop:
@@ -56,7 +76,11 @@ tasks:
       - task: sleep
       - task: start
 
-
+  sleep:
+    vars:
+      DURATION: '{{default 5 .DURATION}}'
+    cmds:
+      - powershell -Command "Start-Sleep -Seconds {{.DURATION}}"
 #  sleep:
 #    vars:
 #      DURATION: '{{default 5 .DURATION}}'
