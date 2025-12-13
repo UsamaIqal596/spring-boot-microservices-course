@@ -119,7 +119,7 @@ services:
     restart: unless-stopped
     depends_on:
       mailhog:
-        condition: service_healthy
+        condition: service_started
       notifications-db:
         condition: service_healthy
       bookstore-rabbitmq:
