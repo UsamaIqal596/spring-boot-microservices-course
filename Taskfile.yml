@@ -29,6 +29,12 @@ tasks:
       - "{{.MVN}} -pl catalog-service spring-boot:build-image -DskipTests"
       - "{{.MVN}} -pl order-service spring-boot:build-image -DskipTests"
       - "{{.MVN}} -pl notification-service spring-boot:build-image -DskipTests"
+      - "{{.MVN}} -pl api-gateway spring-boot:build-image -DskipTests"
+
+# TODO: Explore parallel builds to speed up image creation
+#To fully maximize performance, you can use both:
+#  Maven Build in Parallel: mvn -pl catalog-service,order-service -T 4 -parallel spring-boot:build-image -DskipTests
+#  Docker Compose Start in Parallel: docker compose --parallel up -d
 
   start_infra:
     cmds:

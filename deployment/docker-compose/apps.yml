@@ -46,8 +46,9 @@ services:
       #   all the properties that are provided below are environment variables by capitalizing the .properties file properties
       - SPRING_PROFILES_ACTIVE=docker
 #       as both services are in Docker so host name of catalog-service is its container name
-      - ORDERS_CATALOG_SERVICE_URL=http://catalog-service:8081
-#      - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
+#      - ORDERS_CATALOG_SERVICE_URL=http://catalog-service:8081
+#      - calling catalog service through API-Gateway
+      - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
       - DB_URL=jdbc:postgresql://orders-db:5432/postgres
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
@@ -74,8 +75,12 @@ services:
           memory: 700m
 #    labels:
 #      logging: "promtail"
-
-
+# TODO Need to underatnsd his ???
+#if i run below this will happenned
+#  Uses the existing image if present.
+#  Recreates the container if configuration changes are detected.
+#  Does not rebuild the image or compile code automatically unless you explicitly do
+#    so (mvn spring-boot:build-image or docker build).
   notification-service:
     image: usamaiqbal/bookstore-notification-service
     container_name: notification-service
@@ -107,17 +112,17 @@ services:
       - RABBITMQ_PASSWORD=guest
       # Container name of the mail server as a host here
       - MAIL_HOST=mailhog
-      - MAIL_PORT=:1025
+      - MAIL_PORT=1025
       # main username and passwords are not required here even port is alo not required bcz its default
     ports:
       - "8083:8083"
     restart: unless-stopped
     depends_on:
+      mailhog:
+        condition: service_healthy
       notifications-db:
         condition: service_healthy
       bookstore-rabbitmq:
-        condition: service_healthy
-      mailhog:
         condition: service_healthy
     deploy:
       resources:
@@ -125,3 +130,22 @@ services:
           memory: 700m
 #    labels:
 #      logging: "promtail"
+
+  api-gateway:
+    image: usamaiqbal/bookstore-api-gateway
+    container_name: api-gateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CATALOG_SERVICE_URL=http://catalog-service:8081
+      - ORDER_SERVICE_URL=http://order-service:8082
+#      - MANAGEMENT_TRACING_ENABLED=${MANAGEMENT_TRACING_ENABLED}
+#      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    labels:
+      logging: "promtail"

@@ -1,0 +1,81 @@
+server:
+  port: 8989
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    enabled: false
+    sampling:
+      probability: 1.0
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+#            can we doo this api Gateway routing configuration in the java class..?? TODO
+            - id: catalog-service
+#              catalog service is running here either on localjost or environmeent variable
+              uri: ${CATALOG_SERVICE_URL:http://localhost:8081}
+#              if the request start with below path
+              predicates:
+                - Path=/catalog/**
+#              if req contains above path then below filters will going to apply
+              filters:
+#                in the below /api/product is a segment and it forwards to  catalog service
+#                http://localhost:8989/catalog/api/product --> http://localhost:8081/catalog/api/product
+                - RewritePath=/catalog/?(?<segment>.*), /${segment}
+            - id: orders-service
+              uri: ${ORDER_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/orders/**
+              filters:
+#                - ?(?<segment>.*) this means take the second segment form the request
+                - RewritePath=/orders/?(?<segment>.*), /${segment}
+
+#            this is to get the centerlized api Docs
+            - id: openapi
+              uri: http://localhost:${server.port}
+              predicates:
+#                - if request hit to this URL
+                - Path=/v3/api-docs/**
+              filters:
+#                - then
+                - RewritePath=/v3/api-docs/?(?<segment>.*), /${segment}/v3/api-docs
+          discovery:
+            locator:
+              enabled: true
+          globalcors:
+            cors-configurations:
+#              for all of our APIs from all the domains we are allowing access to our apis
+              '[/**]':
+                allowed-origins: "*"
+                allowed-methods: "*"
+                allowed-headers: "*"
+                allow-credentials: false
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers RETAIN_FIRST
+# this is the new feature to handle the exceptions
+  mvc:
+    problemdetails:
+      enabled: true
+#this is to customize and aggregate all the information
+#this is a static configuration but there is another way to do dynamiccally that we have implemented in SwaggerConfig
+springdoc:
+  swagger-ui:
+    use-root-path: true
+#    urls:
+#      - name: catalog
+#        url: /v3/api-docs/catalog
+#      - name: orders
+#        url: /v3/api-docs/orders
