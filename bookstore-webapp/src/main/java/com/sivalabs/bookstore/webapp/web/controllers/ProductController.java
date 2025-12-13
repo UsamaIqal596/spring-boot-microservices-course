@@ -28,7 +28,7 @@ class ProductController {
         return "products";
     }
 
-    //TODO: why i need to put @ResponseBody here ...??
+    // TODO: why i need to put @ResponseBody here ...??
     @GetMapping("/api/products")
     @ResponseBody
     PagedResult<Product> products(@RequestParam(name = "page", defaultValue = "1") int page, Model model) {
