@@ -320,6 +320,14 @@ RabbitMQ is a **message broker** – a software that allows applications to comm
 ![img_12.png](docs/IMAGES/img_19.png)
 ![img_12.png](docs/IMAGES/img_21.png)
 
+![img_12.png](docs/IMAGES/img_22.png)
+## creating duplicate event/Notification for testing from rabbit MQ, so we can make sure we are not sending the
+duplicate notifications to the customer
+![img_12.png](docs/IMAGES/img_23.png)
+
+### Api Gateway 
+![img_12.png](docs/IMAGES/img_24.png)
+
 
 YOUR WINDOWS MACHINE                         DOCKER CONTAINERS
 ┌─────────────────────────────────────────────────────────────────────────────┐

@@ -74,3 +74,54 @@ services:
           memory: 700m
 #    labels:
 #      logging: "promtail"
+
+
+  notification-service:
+    image: usamaiqbal/bookstore-notification-service
+    container_name: notification-service
+    environment:
+      #     just for underatsnding from the above
+      #      we can use below by Capitalizing the .prperties and relace . with underscore.
+      #      e.g spring.datasource.url  ---> SPRING_DATASOURCE_URL = jdbc:postgresql://catalog-db:5432/postgres
+      #      that is also fine, but below way of setting properties more readable we can use both it's a personal preference.
+      #      - SPRING_PROFILES_ACTIVE=docker
+      #      this below port is the container port, not the hostName("15432:5432") because both are running inside the docker
+      #      - DB_URL=jdbc:postgresql://catalog-db:5432/postgres
+
+
+
+
+      #   all the properties that are provided below are environment variables by capitalizing the .properties file properties
+      - SPRING_PROFILES_ACTIVE=docker
+      #       as both services are in Docker so host name of catalog-service is its container name
+       #      - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
+
+      #  TODO does this will be an other DB from the order or its the same DB logically internally as both have same URL...???
+      - DB_URL=jdbc:postgresql://notifications-db:5432/postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      # Container name of rabbit-MQ
+      - RABBITMQ_HOST=bookstore-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      # Container name of the mail server as a host here
+      - MAIL_HOST=mailhog
+      - MAIL_PORT=:1025
+      # main username and passwords are not required here even port is alo not required bcz its default
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+    depends_on:
+      notifications-db:
+        condition: service_healthy
+      bookstore-rabbitmq:
+        condition: service_healthy
+      mailhog:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+#    labels:
+#      logging: "promtail"

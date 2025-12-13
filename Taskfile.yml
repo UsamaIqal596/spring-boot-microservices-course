@@ -28,6 +28,7 @@ tasks:
       #      after below command Image is written into the local Docker daemon
       - "{{.MVN}} -pl catalog-service spring-boot:build-image -DskipTests"
       - "{{.MVN}} -pl order-service spring-boot:build-image -DskipTests"
+      - "{{.MVN}} -pl notification-service spring-boot:build-image -DskipTests"
 
   start_infra:
     cmds:
