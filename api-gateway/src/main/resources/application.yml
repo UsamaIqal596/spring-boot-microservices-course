@@ -63,8 +63,11 @@ spring:
                 allowed-methods: "*"
                 allowed-headers: "*"
                 allow-credentials: false
+
           default-filters:
             - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers RETAIN_FIRST
+
+
 # this is the new feature to handle the exceptions
   mvc:
     problemdetails:

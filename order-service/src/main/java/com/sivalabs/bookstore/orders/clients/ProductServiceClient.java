@@ -24,8 +24,11 @@ public class ProductServiceClient {
     public Optional<Product> getProductByCode(String code) {
         log.info("Fetching product for code: {}", code);
         //        try {
+
+        // CALLING EXTERNAL SERVICE FROM BY USING REST CLIENT FROM oRDER SERVICE -----TO------> Catalog SERVICE
         var product =
                 restClient.get().uri("/api/products/{code}", code).retrieve().body(Product.class);
+
         return Optional.ofNullable(product);
         //            if i dont catch he exception here it will throw geneuc exception and global(Exception.class
         // will handle this)

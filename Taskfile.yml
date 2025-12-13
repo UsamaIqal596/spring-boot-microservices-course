@@ -30,6 +30,7 @@ tasks:
       - "{{.MVN}} -pl order-service spring-boot:build-image -DskipTests"
       - "{{.MVN}} -pl notification-service spring-boot:build-image -DskipTests"
       - "{{.MVN}} -pl api-gateway spring-boot:build-image -DskipTests"
+      - "{{.MVN}} -pl bookstore-webapp spring-boot:build-image -DskipTests"
 
 # TODO: Explore parallel builds to speed up image creation
 #To fully maximize performance, you can use both:
