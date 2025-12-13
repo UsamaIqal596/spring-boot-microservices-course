@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Import;
 
 @Import(ContainersConfig.class)
 @SpringBootTest
-class OrderServiceApplicationTests extends AbstractIT {
+class OrderServiceApplicationTests {
 
     @Test
     void contextLoads() {}
